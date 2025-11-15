@@ -1,6 +1,7 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import SentenceTransformerEmbeddings
+import os
 
 
 class TextChunker:
@@ -98,7 +99,7 @@ class VectorStore:
         retriever()
     """
 
-    def __init__(self, embedder):
+    def __init__(self, embedder, store_path="vector_store.faiss"):
         """
         Initializes the vector store with the given embedder.
 
@@ -106,7 +107,13 @@ class VectorStore:
             embedder: An object responsible for generating embeddings.
         """
         self.embedder = embedder
-        self.db = None
+        self.store_path = store_path
+        if os.path.exists(store_path):
+            self.db = FAISS.load_local(
+                store_path, self.embedder, allow_dangerous_deserialization=True
+            )
+        else:
+            self.db = None
 
     def create_vector_store(self, docs_split):
         """
@@ -120,6 +127,7 @@ class VectorStore:
             FAISS: The created FAISS vector store instance.
         """
         self.db = FAISS.from_documents(docs_split, self.embedder)
+        self.db.save_local(self.store_path)
         return self.db
 
     def retriever(self):

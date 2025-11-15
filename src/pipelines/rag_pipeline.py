@@ -1,4 +1,5 @@
 from src.pipelines import PDFLoader, TextChunker, Embedder, VectorStore, LLMEngine
+import glob
 
 
 class RAGPipeline:
@@ -34,13 +35,14 @@ class RAGPipeline:
         embedding text, and interacting with a language model.
 
         Args:
-            pdf_path (str): The file path to the PDF document to be processed.
+            pdf_path (str): The directory path with PDF documents to be processed.
             embed_model (str, optional): The name of the embedding model to use.
                 Defaults to "all-MiniLM-L6-v2".
             llm_model (str, optional): The name of the large language model to use.
                 Defaults to "tiiuae/falcon-7b-instruct".
         """
-        self.pdf_loader = PDFLoader(pdf_path)
+        self.pdf_path = pdf_path
+        self.pdf_loader = PDFLoader()
         self.chunker = TextChunker()
         self.embedder = Embedder(embed_model).get()
         self.vector_store = VectorStore(self.embedder)
@@ -58,9 +60,14 @@ class RAGPipeline:
         Raises:
             Exception: If any step in the process fails.
         """
-        docs = self.pdf_loader.load()
-        docs_split = self.chunker.split(docs)
-        self.vector_store.create_vector_store(docs_split)
+        if not self.vector_store.db:
+            docs = []
+            for pdf_file in glob.glob(f"{self.pdf_path}/*.pdf"):
+                docs.extend(self.pdf_loader.load(pdf_file))
+            docs_split = self.chunker.split(docs)
+            self.vector_store.create_vector_store(docs_split)
+        else:
+            print("Vector store already exists. Skipping index building.")
 
     def query(self, question: str, k=3):
         """
