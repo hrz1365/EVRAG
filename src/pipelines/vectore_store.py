@@ -105,6 +105,8 @@ class VectorStore:
 
         Args:
             embedder: An object responsible for generating embeddings.
+            store_path (str): The file path to store the vector database.
+              Defaults to "vector_store.faiss".
         """
         self.embedder = embedder
         self.store_path = store_path

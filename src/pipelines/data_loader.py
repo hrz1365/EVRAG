@@ -16,7 +16,7 @@ class PDFLoader:
 
     def __init__(self):
         """Initializes the PDFLoader with the given file path."""
-        # self.file_path = file_path
+        pass
 
     def load(self, file_path):
         """Loads and parses the PDF file.
