@@ -1,7 +1,9 @@
 import pandas as pd
 from deepeval import evaluate
+from deepeval.evaluate import DisplayConfig
 from deepeval.test_case import LLMTestCase
 from src.evaluation import get_gemini_model, get_metrics
+import time
 
 
 def build_test_cases(rag, df):
@@ -28,7 +30,6 @@ def build_test_cases(rag, df):
               are not directly supported):
               A dictionary containing the predefined and retrieved contexts.
     """
-
     test_cases = []
 
     for _, row in df.iterrows():
@@ -50,9 +51,9 @@ def build_test_cases(rag, df):
         )
 
         # Attach contexts for newer DeepEval versions
-        if hasattr(case, "contexts"):
-            case.contexts = contexts
-            case.retrieval_contexts = retrieved_contexts
+        if hasattr(case, "context"):
+            case.context = contexts
+            case.retrieval_context = retrieved_contexts
         else:
             case.additional_metadata = {
                 "contexts": contexts,
@@ -70,7 +71,7 @@ def run_evaluation(rag, eval_data_path):
 
     Args:
         rag: The RAG model instance to be evaluated.
-        eval_data_path (str): The file path to the evaluation data in CSV format.
+        eval_data_path (str): The file path to the evaluation data in excel format.
 
     Returns:
         dict: A dictionary containing the evaluation results, including detailed metrics.
@@ -82,8 +83,12 @@ def run_evaluation(rag, eval_data_path):
     4. Runs the evaluation process using the test cases and metrics.
     5. Returns the evaluation results, including detailed information.
     """
+
+    disConfig = DisplayConfig(
+        show_indicator=False, print_results=False, verbose_mode=False
+    )
     # Load evaluation data
-    df = pd.read_csv(eval_data_path)
+    df = pd.read_excel(eval_data_path)
 
     # Build test cases
     test_cases = build_test_cases(rag, df)
@@ -93,10 +98,23 @@ def run_evaluation(rag, eval_data_path):
     metrics = get_metrics(model=gemini_model)
 
     # Run evaluation
-    results = evaluate(
-        test_cases=test_cases,
-        metrics=metrics,
-        return_details=True,
-    )
-
+    results = []
+    for i, test_case in enumerate(test_cases):
+        row = {
+            "case_id": i,
+            "input": test_case.input,
+            "model_output": test_case.actual_output,
+            "ground_truth": test_case.expected_output,
+        }
+        for metric in metrics:
+            result = evaluate(
+                test_cases=[test_case], metrics=[metric], display_config=disConfig
+            )
+            metric_name = result.test_results[0].metrics_data[0].name
+            score = result.test_results[0].metrics_data[0].score
+            reason = result.test_results[0].metrics_data[0].reason
+            row[f"{metric_name}_score"] = f"{score:.3f}"
+            row[f"{metric_name}_reason"] = reason
+            time.sleep(20)  # To avoid rate limiting
+        results.append(row)
     return results
