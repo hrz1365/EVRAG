@@ -34,5 +34,33 @@ The project is modular, reproducible, and structured for portfolio presentation.
 ## Installation
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/<your-username>/rag-evaluation-pipeline.git
-cd rag-evaluation-pipeline
+git clone https://github.com/hrz1365/EVRAG.git
+cd EVRAG
+```
+### 2. Create and activate a virtual environment
+```bash
+python -m venv venv
+source venv/bin/activate      # on macOS/Linux
+venv\Scripts\activate         # on Windows
+```
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+### 4. Set your environment variable for Gemini 
+```bash
+export GEMINI_API_KEY="your_api_key_here"     # macOS/Linux
+setx GEMINI_API_KEY "your_api_key_here"       # Windows
+```
+## Usage
+### 1. Ask questions interactively
+```bash
+python main.py --mode query --query "What type of facility has power demand equal to around 5 MW?"
+```
+Answer:
+an outdoor professional sports stadium
+
+### 2. Run full evaluation
+```bash
+python main.py --mode 'validate' --pdf './data/' --query 'What type of facility has power demand euqal to around 40 MW?' --validation './data/validation_set.xlsx' --report './data/validation_results.xlsx'
+```
