@@ -32,3 +32,6 @@ outputs/
 .idea/
 
 .deepeval/
+
+# Vector stores
+*.faiss
