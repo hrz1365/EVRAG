@@ -1,0 +1,16 @@
+{
+    "case_id": 3,
+    "input": "How many years are necessary to make high-voltage transmission level interconnection upgrades?",
+    "model_output": "4-8 years.",
+    "ground_truth": "4-8 years",
+    "Answer Relevancy_score": "1.000",
+    "Answer Relevancy_reason": "The score is 1.00 because there were no irrelevant statements, indicating perfect alignment with the input question! Great job!",
+    "Faithfulness_score": "1.000",
+    "Faithfulness_reason": "The score is 1.00 because there are no contradictions, indicating perfect alignment between the retrieval context and the actual output! Great job!",
+    "Contextual Precision_score": "0.500",
+    "Contextual Precision_reason": "The score is 0.50 because the first node in the retrieval contexts, which states that the document \"discusses the long timelines for grid infrastructure upgrades but does not directly answer how many years are necessary\", is not relevant, while the second node, which states that \"These interconnection upgrades can incur substantial cost and take 4-8 years to complete\", is relevant. The irrelevant node is ranked higher than the relevant node.",
+    "Factual Correctness [GEval]_score": "1.000",
+    "Factual Correctness [GEval]_reason": "The actual output matches the expected output, indicating strong alignment with the evaluation steps. There are no contradictions or omissions.",
+    "Semantic Similarity [GEval]_score": "1.000",
+    "Semantic Similarity [GEval]_reason": "The actual output and expected output are identical, expressing the same meaning. There are no contradictions or incorrect information introduced."
+}

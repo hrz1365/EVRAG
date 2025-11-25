@@ -1,0 +1,16 @@
+{
+    "case_id": 0,
+    "input": "What proportion of sites will cross the 5-MW charging capacity threshold in 2030?",
+    "model_output": "Over a quarter.",
+    "ground_truth": "Over a quarter of the 71 sites studied ",
+    "Answer Relevancy_score": "1.000",
+    "Answer Relevancy_reason": "The score is 1.00 because there were no irrelevant statements, indicating perfect alignment with the input question! Great job!",
+    "Faithfulness_score": "1.000",
+    "Faithfulness_reason": "The score is 1.00 because there are no contradictions, indicating perfect alignment between the actual output and the retrieval context! Great job!",
+    "Contextual Precision_score": "0.833",
+    "Contextual Precision_reason": "The score is 0.83 because the second node in the retrieval contexts, which states that \"While this document discusses charging capacity thresholds, it focuses on 2045 and doesn't directly address the proportion of sites crossing the 5-MW threshold in 2030,\" is irrelevant and should ideally be ranked lower. However, the first and third nodes are relevant, thus the score is not lower.",
+    "Factual Correctness [GEval]_score": "0.200",
+    "Factual Correctness [GEval]_reason": "The actual output omits the crucial detail that the 'over a quarter' refers to the 71 sites studied. This omission significantly impacts the accuracy and completeness of the response, leading to a low score.",
+    "Semantic Similarity [GEval]_score": "1.000",
+    "Semantic Similarity [GEval]_reason": "The actual output expresses the same meaning as the expected output. The actual output is a shortened version of the expected output, but it does not introduce any incorrect or contradictory information. Therefore, the actual output is semantically equivalent to the expected output."
+}

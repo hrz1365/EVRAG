@@ -1,0 +1,16 @@
+{
+    "case_id": 2,
+    "input": "What is the contribution of transportation to the greenhouse gas emissions in the United States?",
+    "model_output": "Over a quarter of all emissions in 2020.",
+    "ground_truth": "Over a quarter of all emissions in 2020",
+    "Answer Relevancy_score": "1.000",
+    "Answer Relevancy_reason": "The score is 1.00 because the response is perfectly relevant! Great job!",
+    "Faithfulness_score": "1.000",
+    "Faithfulness_reason": "The score is 1.00 because there are no contradictions, indicating perfect alignment between the retrieval context and the actual output! Great job!",
+    "Contextual Precision_score": "1.000",
+    "Contextual Precision_reason": "The score is 1.00 because the relevant node is ranked first, and the subsequent nodes are less relevant as the second node only contains the title 'for Carbon-Free Transportation' and the third node only contains the title 'for Carbon-Free Transportation'.",
+    "Factual Correctness [GEval]_score": "1.000",
+    "Factual Correctness [GEval]_reason": "The actual output and expected output are identical, indicating strong alignment and factual accuracy.",
+    "Semantic Similarity [GEval]_score": "1.000",
+    "Semantic Similarity [GEval]_reason": "The actual output and expected output are identical, expressing the same meaning. There are no incorrect or contradictory details introduced."
+}

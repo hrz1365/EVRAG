@@ -1,0 +1,16 @@
+{
+    "case_id": 1,
+    "input": "What woul be the equivalence of a peak demand at around 40 MW?",
+    "model_output": "The provided context does not contain the information to answer what a 40 MW peak demand would be equivalent to.",
+    "ground_truth": "A major industrial site",
+    "Answer Relevancy_score": "1.000",
+    "Answer Relevancy_reason": "The score is 1.00 because there were no irrelevant statements, indicating perfect alignment with the input! Great job!",
+    "Faithfulness_score": "1.000",
+    "Faithfulness_reason": "The score is 1.00 because there are no contradictions, indicating perfect alignment between the retrieval context and the actual output! Great job!",
+    "Contextual Precision_score": "0.000",
+    "Contextual Precision_reason": "The score is 0.00 because all retrieval contexts are irrelevant. The first node mentions \"Peak Demand\" but doesn't provide information about the equivalence of a 40 MW peak demand. The second node does not provide any information about the equivalence of a 40 MW peak demand. The third node mentions \"peak demand\" but it does not explicitly state the equivalence of a 40 MW peak demand.",
+    "Factual Correctness [GEval]_score": "0.000",
+    "Factual Correctness [GEval]_reason": "The actual output states that it cannot answer the question, while the expected output provides a specific answer ('A major industrial site'). This is a direct contradiction and omission of the expected answer, indicating a lack of factual accuracy.",
+    "Semantic Similarity [GEval]_score": "0.000",
+    "Semantic Similarity [GEval]_reason": "The actual output states that the context lacks the information to answer the question, while the expected output provides an answer ('A major industrial site'). These outputs do not express the same meaning, and the actual output does not provide a valid answer based on the expected output."
+}

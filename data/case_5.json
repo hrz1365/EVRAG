@@ -1,0 +1,16 @@
+{
+    "case_id": 5,
+    "input": "What is the source of MHDV modeling in the electric highways study?",
+    "model_output": "The MHDV modeling is based on a scenario that assumes 100% of new MHDV sales are battery-electric by 2045.",
+    "ground_truth": "Geotab\u2019s ITS Altitude platform",
+    "Answer Relevancy_score": "1.000",
+    "Answer Relevancy_reason": "The score is 1.00 because there were no irrelevant statements, indicating perfect alignment with the input question! Great job!",
+    "Faithfulness_score": "1.000",
+    "Faithfulness_reason": "The score is 1.00 because there are no contradictions, indicating perfect alignment between the actual output and the retrieval context! Great job!",
+    "Contextual Precision_score": "0.000",
+    "Contextual Precision_reason": "The score is 0.00 because the first node in the retrieval contexts \"discusses LDVs and MHDV electrification planning, but it does not mention the source of MHDV modeling or Geotab\u2019s ITS Altitude platform.\", the second node in the retrieval contexts \"presents a load curve variation and discusses electric highways, but it does not mention the source of MHDV modeling or Geotab\u2019s ITS Altitude platform.\", and the third node in the retrieval contexts \"discusses MHDV sales scenarios, but it does not mention the source of MHDV modeling or Geotab\u2019s ITS Altitude platform.\". All of these nodes are irrelevant and should be ranked lower.",
+    "Factual Correctness [GEval]_score": "0.000",
+    "Factual Correctness [GEval]_reason": "The actual output states the MHDV modeling is based on a scenario about battery-electric vehicle sales, while the expected output states the source is Geotab's ITS Altitude platform. These are contradictory, and the actual output fails to provide the expected source. Therefore, the response receives a score of 0.",
+    "Semantic Similarity [GEval]_score": "0.000",
+    "Semantic Similarity [GEval]_reason": "The actual output discusses MHDV modeling and battery-electric vehicle sales, while the expected output refers to 'Geotab's ITS Altitude platform.' These outputs have completely different meanings and topics, indicating no semantic equivalence. Therefore, the actual output contradicts the expected output."
+}
