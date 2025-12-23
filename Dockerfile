@@ -1,34 +1,62 @@
-# ----------------------------------------------
-# Dockerfile for RAG-CFT
-# ----------------------------------------------
-FROM python:3.10-slim
+# ============================================================
+# 1. Base image
+# ============================================================
+FROM python:3.11-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV APP_HOME=/app
+# ============================================================
+# 2. Python runtime optimizations
+# ============================================================
+ENV PYTHONDONTWRITEBYTECODE=1       
+ENV PYTHONUNBUFFERED=1              
+ENV TRANSFORMERS_CACHE=/app/models  
 
-# Set working directory
-WORKDIR $APP_HOME
+# ============================================================
+# 3. Configurable non-root user setup (best practice)
+# ============================================================
+ARG USERNAME=raguser
+ARG USER_UID=1000
+ARG USER_GID=${USER_UID}
 
-# Create a non-root user and group
-RUN addgroup --system appgroup && adduser --system --group raguser
+RUN groupadd --gid ${USER_GID} ${USERNAME} && \
+    useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME}
 
-# Copy and install depedendencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# ============================================================
+# 4. System dependencies (only what's needed)
+# ============================================================
+RUN apt-get update && apt-get install -y \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy all project files
-COPY . .
+# ============================================================
+# 5. Create app directories with correct permissions
+# ============================================================
+WORKDIR /app
+RUN mkdir -p /app/models /app/data /app/reports && \
+    chown -R ${USERNAME}:${USERNAME} /app
 
-# Change ownership of the app directory
-RUN chown -R raguser:appgroup $APP_HOME
+# ============================================================
+# 6. Install Python dependencies first (for caching)
+# ============================================================
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Switch to the non-root user
-USER raguser
+# ============================================================
+# 7. Copy your application code
+# ============================================================
+COPY . /app
+RUN chown -R ${USERNAME}:${USERNAME} /app
 
-# Expose the port the app runs on
-EXPOSE 8080
+# ============================================================
+# 8. Switch to non-root user (security best practice)
+# ============================================================
+USER ${USERNAME}
 
-# Command to run the application
-CMD ["python", "app.py"]
+# ============================================================
+# 9. Expose port (for API or Streamlit later)
+# ============================================================
+EXPOSE 8501
+
+# ============================================================
+# 10. Default CMD (overridden by docker-compose if needed)
+# ============================================================
+CMD ["python", "main.py"]

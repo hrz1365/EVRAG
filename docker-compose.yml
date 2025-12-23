@@ -1,0 +1,22 @@
+services:
+  rag-app:
+    build: .
+    container_name: rag_app
+
+    environment:
+      GeminiRoya: ${GeminiRoya}
+    
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    
+    command: 
+      - python
+      - main.py
+      - --mode
+      - query
+      - --query
+      - "What is the capital of France?"
+      - --pdf
+      - '/app/data/electric_highways.pdf'
+  
