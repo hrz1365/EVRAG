@@ -35,7 +35,7 @@ def parse_args():
     parser.add_argument(
         "--report",
         type=str,
-        default="reports/evaluation_results.xlsx",
+        default="data/validation_results.xlsx",
         help="Path to save evaluation results.",
     )
     return parser.parse_args()
@@ -61,7 +61,7 @@ def main():
             return
 
         print(f"Querying RAG Pipeline with question: {args.query}")
-        answer = rag.query(args.query)
+        answer, _ = rag.query(args.query)
 
         print("Answer:")
         print(answer)

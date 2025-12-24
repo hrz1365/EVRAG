@@ -41,7 +41,7 @@ def build_test_cases(rag, df):
         contexts = [ctx_text] if isinstance(ctx_text, str) and ctx_text else []
 
         # Get model answer + actual retrieved contexts
-        answer = rag.query(question)
+        answer, _ = rag.query(question)
         retriever = rag.vector_store.retriever()
         results = retriever.invoke(question)
         retrieved_contexts = [doc.page_content for doc in results]
