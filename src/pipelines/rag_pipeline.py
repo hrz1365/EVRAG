@@ -85,5 +85,15 @@ class RAGPipeline:
             f"Question: {question}\n\nAnswer:"
         )
 
-        response = self.llm_engine.generate(prompt)
-        return response, context
+        answer = self.llm_engine.generate(prompt)
+
+        # Return both answer and sources
+        sources = [
+            {
+                "content": doc.page_content,
+                "source": doc.metadata.get("source"),
+                "page": doc.metadata.get("page"),
+            }
+            for doc in results
+        ]
+        return answer, sources

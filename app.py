@@ -45,7 +45,7 @@ query = st.text_input("Enter your question:")
 
 if st.button("Run Query") and rag and query:
     with st.spinner("Retrieving context and generating answer..."):
-        answer, context = rag.query(
+        answer, sources = rag.query(
             question=query,
             k=top_k,
         )
@@ -53,5 +53,10 @@ if st.button("Run Query") and rag and query:
     st.subheader("✅ Answer")
     st.write(answer)
 
-    with st.expander("🔍 Retrieved Context"):
-        st.text(context)
+    st.markdown("### 📚 Supporting Contexts")
+
+    for i, source in enumerate(sources, start=1):
+        st.markdown(f"**Context {i}:**")
+        st.text(source["content"])
+        st.markdown(f"_Source: {source['source']} (Page {source['page']})_")
+        st.write("---")
