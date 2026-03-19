@@ -1,0 +1,5 @@
+,query_id,question,answer,context,section_number,section_name,file_name,question_type
+0,query_1,Why is managing EV charging time important for both cost and user adoption?,"Because off-peak charging reduces electricity costs while widespread charging access reduces range anxiety, both of which support EV adoption.","Transportation is the largest source of greenhouse gas emissions in the United States, contributing over a quarter of all emissions in 2020. 
+For light-duty vehicles (LDVs), highway charging is crucial to provide seamless access along common passenger routes, alleviating range anxiety on longer trips. 
+If vehicles are primarily charged off-peak, they will likely reduce electricity costs and prices by improving system utilization. 
+However, increasing EV adoption also intensifies questions about energy access and affordability in the face of growing electricity demand.",Mixed,Cross-Section Reasoning,combined_documents.pdf,multi-hop
