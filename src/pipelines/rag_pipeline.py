@@ -1,6 +1,6 @@
 from src.pipelines import PDFLoader, TextChunker, Embedder, VectorStore, LLMEngineGemini
 import glob
-
+import json
 
 class RAGPipeline:
     """
@@ -56,13 +56,14 @@ class RAGPipeline:
         if not self.vector_store.db:
             docs = []
             for pdf_file in glob.glob(f"{self.pdf_path}/*.pdf"):
+                print(f"found this doc {pdf_file}")
                 docs.extend(self.pdf_loader.load(pdf_file))
             docs_split = self.chunker.split(docs)
             self.vector_store.create_vector_store(docs_split)
         else:
             print("Vector store already exists. Skipping index building.")
 
-    def query(self, question: str, k: int = 3):
+    def query(self, question: str, k: int = 7):
         """
         Query the vector store and generate a response using the language model.
 
@@ -75,25 +76,29 @@ class RAGPipeline:
             str: The generated response from the language model based on
               the retrieved context.
         """
+        
+
         retriever = self.vector_store.retriever(k=k)
         results = retriever.invoke(question)
-
-        context = "\n".join([doc.page_content for doc in results])
-        prompt = (
-            f"Answer the following question concisely using only the provided context.\n\n"
-            f"Context:\n{context}\n\n"
-            f"Question: {question}\n\nAnswer:"
-        )
+        source={}
+        for i,doc in enumerate(results):
+            #['producer', 'creator', 'creationdate', 'author', 'keywords', 'moddate', 'title', 'trapped', 'source', 'total_pages', 'page', 'page_label']
+            source[str(i)]={
+                    "content": doc.page_content,
+                    "source": doc.metadata.get("source"),
+                    "page": doc.metadata.get("page"),
+                    "title": doc.metadata.get('title')
+                    
+                }
+                
+        
+        
+        
+        prompt = f"\n\n Answer the following question\n\n\n\n this is the context Context:\n{json.dumps(source)},\n\n Question: {question}\n\nAnswer:"
+        
 
         answer = self.llm_engine.generate(prompt)
 
         # Return both answer and sources
-        sources = [
-            {
-                "content": doc.page_content,
-                "source": doc.metadata.get("source"),
-                "page": doc.metadata.get("page"),
-            }
-            for doc in results
-        ]
-        return answer, sources
+        
+        return answer, json.dumps(source)

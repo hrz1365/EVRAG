@@ -1,7 +1,39 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import SentenceTransformerEmbeddings
+from langchain_community.retrievers import BM25Retriever
+
 import os
+import pickle
+from typing import List
+# from langchain.schema import Document
+
+class WeightedEnsembleRetriever:
+    def __init__(self, retrievers: List, weights: List):
+        self.retrievers = retrievers
+        self.weights = weights
+        print("Hybrid Reranker")
+
+    def invoke(self, query: str) -> List:
+        scored_docs = []
+        for retriever, weight in zip(self.retrievers, self.weights):
+            # must use similarity_search_with_score if FAISS
+            if hasattr(retriever, "similarity_search_with_score"):
+                docs_and_scores = retriever.similarity_search_with_score(query, k=5)
+                for doc, score in docs_and_scores:
+                    doc.metadata["weighted_score"] = score * weight
+                    scored_docs.append(doc)
+            else:
+                # fallback for retrievers without score
+                docs = retriever._get_relevant_documents(query,run_manager=None)
+                for doc in docs:
+                    doc.metadata["weighted_score"] = 1.0 * weight
+                    scored_docs.append(doc)
+        # optional: sort by score
+        scored_docs.sort(key=lambda d: getattr(d, "score", 0), reverse=True)
+        print(scored_docs)
+        exit()
+        return scored_docs
 
 
 class TextChunker:
@@ -102,7 +134,7 @@ class VectorStore:
         retriever()
     """
 
-    def __init__(self, embedder, store_path="vector_store.faiss"):
+    def __init__(self, embedder, search_type="hybrid", store_path_faiss="vector_store.faiss",  store_path_bm25="bm25_retriever.pkl"):
         """
         Initializes the vector store with the given embedder.
 
@@ -111,14 +143,22 @@ class VectorStore:
             store_path (str): The file path to store the vector database.
               Defaults to "vector_store.faiss".
         """
+        if not search_type in ["hybrid", "mmr", "similarity"]:
+            raise("Search type is unacceptable", search_type)
+        self.search_type=search_type
         self.embedder = embedder
-        self.store_path = store_path
-        if os.path.exists(store_path):
+        self.store_path_faiss = store_path_faiss
+        self.store_path_bm25 =store_path_bm25
+        if os.path.exists(store_path_faiss):
             self.db = FAISS.load_local(
-                store_path, self.embedder, allow_dangerous_deserialization=True
+                self.store_path_faiss, self.embedder, allow_dangerous_deserialization=True
             )
+            
+            with open(self.store_path_bm25, "rb") as f:
+                self.bm25_retriever =  pickle.load(f)
         else:
             self.db = None
+            self.bm25_retriever = None
 
     def create_vector_store(self, docs_split):
         """
@@ -132,10 +172,15 @@ class VectorStore:
             FAISS: The created FAISS vector store instance.
         """
         self.db = FAISS.from_documents(docs_split, self.embedder)
-        self.db.save_local(self.store_path)
-        return self.db
+        self.db.save_local(self.store_path_faiss)
 
-    def retriever(self, k=3):
+        self.bm25_retriever = BM25Retriever.from_documents(docs_split)
+        with open(self.store_path_bm25, "wb") as f:
+            pickle.dump(self.bm25_retriever , f)
+        
+        # return self.db, self.bm25_retriever
+
+    def retriever(self, k=7):
         """
         Retrieve the top-k most relevant items from the vector store.
 
@@ -155,4 +200,19 @@ class VectorStore:
 
         if self.db is None:
             raise ValueError("Vector store has not been created yet.")
-        return self.db.as_retriever(search_kwargs={"k": k})
+        if self.bm25_retriever is None and self.search_type=="hybrid":
+            raise ValueError("BM25 store has not been created yet.")
+
+        
+        if self.search_type =="hybrid":
+            self.bm25_retriever.k = k
+
+            hybrid_retriever = WeightedEnsembleRetriever(
+                retrievers=[self.bm25_retriever, self.db.as_retriever(search_kwargs={"k": k, "fetch_k": 2*k})], 
+                weights=[0.5, 0.5] 
+            )
+            return  hybrid_retriever
+        if self.search_type=="similarity" or self.search_type=="mmr":
+            return self.db.as_retriever(
+                search_type=self.search_type, # Options: "similarity", "mmr", "similarity_score_threshold"
+                search_kwargs={"k": k, "fetch_k": 2*k}) # Fetch 2k, return best k )

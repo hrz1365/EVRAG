@@ -1,8 +1,10 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from dotenv import load_dotenv
+# import google.genai as genai
 import google.generativeai as genai
+import  dotenv
+from dotenv import load_dotenv, dotenv_values 
 import os
-
 
 class LLMEngine:
     """
@@ -42,6 +44,7 @@ class LLMEngine:
             llm_pipeline (Pipeline): The text generation pipeline initialized
               with the model and tokenizer.
         """
+        load_dotenv()
         self.model_id = model_id
         self.device = device
         self.tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -117,18 +120,25 @@ class LLMEngineGemini:
 
         Args:
           model_name (str, optional): The name of the generative model to use.
-            Defaults to "gemini-2.5-flash".
+            Defaults to "gemini-2.5-pro".
 
         Raises:
           ValueError: If the "GeminiRoya" environment variable is not set.
         """
         key = os.getenv("GeminiRoya")
+        
         if not key:
             raise ValueError("Gemini environment variable not set.")
+        
         genai.configure(api_key=key)
-        self.model = genai.GenerativeModel(model_name)
 
-    def generate(self, prompt: str):
+        self.model = genai.GenerativeModel(model_name)
+        # self.model_name=model_name
+        # client = genai.Client(api_key=key)
+        # self.model = client.models
+
+    def generate(self, user_prompt: str):
+       
         """
         Generates a response based on the provided prompt using the model.
 
@@ -138,12 +148,36 @@ class LLMEngineGemini:
         Returns:
           str: The generated response text.
         """
-        messages = [
-            {"role": "model", "parts": ["You are a helpful assistant."]},
-            {"role": "user", "parts": [prompt]},
-        ]
 
+        system_instruction="""
+        you are a helpful AI assistant operating in a multi-document retrieval-augmented generation (RAG) system.
+        Answer the user's question using only the information explicitly stated in the provided documents.
+        ***Rules:
+        * You may combine information from multiple documents only when they are consistent and directly relevant
+        * When answering, cite supporting documents using their identifiers (e.g., title and page number [future of vehicle grid integration , 2]).
+        * Do not infer missing details or resolve conflicts on your own
+        * If documents contain conflicting information, clearly state that the sources disagree
+        * Do not use prior knowledge or external information
+        * If the provided documents do not contain sufficient information to answer the question, respond exactly with: "I am sorry, I could not find relevant information."
+        Keep answers concise, factual, and grounded in the documents.
+        ***Important***
+        The source and page is given as part of context. use it for referencing 
+        ***Input***
+            'content': the content retrieved
+            'source': the path to the file
+            'page': page number of content
+            'title': file name
+        """
+        messages = [
+            {"role": "model", "parts": [system_instruction]},
+            {"role": "user", "parts": [user_prompt]},
+        ]
+        
+        # print(messages)
+        # return
         # Generate the response
         response = self.model.generate_content(messages)
+        # response = self.model.generate_content(contents = prompt , model=self.model_name)
+        print(response)
 
         return response.candidates[0].content.parts[0].text
