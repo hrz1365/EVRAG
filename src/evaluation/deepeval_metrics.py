@@ -3,11 +3,16 @@ from deepeval.metrics import (
     AnswerRelevancyMetric,
     FaithfulnessMetric,
     ContextualPrecisionMetric,
-    GEval,
+    # Contextual Recall,
+    GEval, 
+    # EmbeddingSimilarityMetric,
+    # F1ScoreMetric,
+    # RoughRecallAtNMetric
 )
 from deepeval.test_case import LLMTestCaseParams
 from dotenv import load_dotenv
 import os
+
 
 
 load_dotenv()
@@ -37,7 +42,7 @@ def get_gemini_model():
     return model
 
 
-def get_cusom_metrics(model=None):
+def get_custom_metrics(model=None):
     """
     Generate a list of custom evaluation metrics for assessing the performance of a model.
 
@@ -95,7 +100,7 @@ def get_cusom_metrics(model=None):
     return [correctness_metric, similarity_metric]
 
 
-def get_metrics(model=None, include_custom_metrics=True):
+def get_metrics(model=None):
     """
     Retrieves a list of evaluation metrics for a given model.
 
@@ -112,14 +117,16 @@ def get_metrics(model=None, include_custom_metrics=True):
     if model is None:
         model = get_gemini_model()
 
-    base_metrics = [
+    custom_metrics = get_custom_metrics(model=model)
+    LLM_metrics = [
         AnswerRelevancyMetric(model=model, verbose_mode=False),
         FaithfulnessMetric(model=model, verbose_mode=False),
         ContextualPrecisionMetric(model=model, verbose_mode=False),
-    ]
+    ]+custom_metrics
 
-    if include_custom_metrics:
-        custom_metrics = get_cusom_metrics(model=model)
-        metrics = base_metrics + custom_metrics
+    # non_LLM=[F1ScoreMetric(), RoughRecallAtNMetric(N=k)]
 
-    return metrics
+    
+        
+    return AnswerRelevancyMetric
+    
